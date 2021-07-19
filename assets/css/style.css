@@ -1,0 +1,398 @@
+
+.navbar {
+	background: DarkSlateBlue;
+	top: 0;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	top: 0;
+	width: 100%;
+	position: fixed;
+	z-index: 1
+}
+
+.overall {
+	margin-top: 200px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 1000px;
+}
+
+.navbar h1 {
+	color: white;
+	padding: 10px 0px 0px;
+}
+
+.navbar ul {
+	list-style-type: none;
+	margin-left: 600px;
+	padding: 8px;
+	/*background: gray;*/
+}
+
+.navbar li {
+	display: inline;
+	padding: 8px;
+}
+
+.navbar li a {
+	text-decoration: none;
+	color: white;
+}
+
+.intro {
+	font-size: 18px;
+}
+
+h1 {
+	color: white;
+	text-decoration: none;
+	text-align: center;
+}
+
+.localize {
+	position: relative;
+	
+}
+
+.localize .localize-title {
+	position: relative;
+	/*margin-left: 300px;
+	margin-right: 800px;*/
+	margin: auto;
+	padding: 10px 100px;
+	text-align: center;
+	width: 295px;
+}
+
+.localize-input {
+	position: relative;
+	/*margin-left: 300px;*/
+	margin: auto;
+	display: inline-block;
+	border: dotted gray 1px;
+	width: 504px;
+}
+
+.points {
+	display: inline-block;
+	width: 310px;
+	height: 300px;
+	background-color: lightgray;
+	padding: 10px;
+}
+
+.distances {
+	display: inline-block;
+	width: 150px;
+	height: 300px;
+	padding: 10px;
+	background-color: lightgray;
+}
+
+.answer {
+	position: relative;
+	bottom: 50px;
+	left: 150px;
+	display: inline-block;
+	text-align: center;
+}
+
+.answer-box {
+	border: solid gray 1px;
+	height: 50px;
+	background-color: lightgray;
+	position: relative;
+	bottom: 5px;
+}
+
+.motion {
+	position: relative;
+	margin: auto;
+}
+
+.motion-title {
+	text-align: center;
+	width: 500px;
+}
+
+.motion-input {
+	padding: 10px;
+	position: relative;
+	display: inline-block;
+}
+
+.constants {
+	display: inline-block;
+	background-color: lightgray;
+	padding: 10px;
+	width: 200px;
+	height: 250px;
+}
+
+.wheeltimespeed {
+	display: inline-block;
+	background-color: lightgray;
+	padding: 10px;
+	height: 250px;
+	width: 250px;
+}
+
+#OrientationAnswer {
+	position: relative;
+	text-align: center;
+	top: 10px;
+	bottom: 10px;
+	visibility: hidden;
+}
+
+#LocalizedAnswer {
+	position: relative;
+	text-align: center;
+	top: 10px;
+	bottom: 10px;
+	visibility: hidden;
+}
+
+.vision {
+	position: relative;
+	margin: auto;
+}
+
+.vision-title {
+	position: relative;
+	text-align: center;
+	width: 500px;
+}
+
+.vision-input {
+	position: relative;
+	padding: 10px;
+	display: inline-block;
+}
+
+.vision-constants {
+	position: relative;
+	width: 230px;
+	display: inline-block;
+	background-color: lightgray;
+	padding: 10px;
+	height: 250px;
+}
+
+.vision-variables {
+	position: relative;
+	display: inline-block;
+	width: 250px;
+	background-color: lightgray;
+	padding: 10px;
+	height: 250px;
+}
+
+#DistanceAnswer {
+	position: relative;
+	text-align: center;
+	top: 10px;
+	bottom: 10px;
+	visibility: hidden;
+}
+
+.controls {
+	position: relative;
+	margin: auto;
+}
+
+.control-title {
+	position: relative;
+	text-align: center;
+	width: 560px;
+}
+
+.control-input {
+	position: relative;
+	padding: 10px;
+	display: inline-block;
+}
+
+.control-constants {
+	position: relative;
+	width: 230px;
+	display: inline-block;
+	background-color: lightgray;
+	padding: 10px;
+	height: 200px;
+}
+
+.control-variables {
+	position: relative;
+	display: inline-block;
+	width: 250px;
+	background-color: lightgray;
+	padding: 10px;
+	height: 200px;
+}
+
+#AngleAnswer {
+	position: relative;
+	text-align: center;
+	top: 10px;
+	bottom: 10px;
+	visibility: hidden;
+}
+
+button {
+	background-color: #4CAF50;
+	border: none;
+	color: white;
+	padding: 15px 32px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin: 4px 2px;
+	cursor: pointer;
+	margin: 0px;
+}
+
+input {
+	width: 100px;
+}
+
+.animation {
+	position: relative;
+	margin: auto;
+	width: 1000px;
+	height: 500px;
+	background-color: lightgray;
+	overflow: hidden;
+}
+
+.animation2 {
+	position: relative;
+	margin: auto;
+	background-color: lightgray;
+	overflow: hidden;
+}
+
+.latex {
+	font-family: "Computer Modern Sans";
+	/*font-style: italic;*/
+}
+
+#pointA {
+	position: absolute;
+	border-radius: 50%;
+	width: 10px;
+	height: 10px;
+	background: red;
+	top: 100px;
+	left: 150px;
+	overflow: hidden;
+}
+
+#AroundPointA {
+	position: absolute;
+	border-radius: 50%;
+	overflow: hidden;
+	/*
+	width: 100px;
+	height: 100px;
+	top: 54.5px;
+	left: 104px;
+	border: 1px solid red;
+	overflow: hidden;*/
+}
+
+#pointB {
+	position: absolute;
+	border-radius: 50%;
+	width: 10px;
+	height: 10px;
+	background: yellow;
+	top: 400px;
+	left: 450px;
+}
+
+#AroundPointB {
+	position: absolute;
+	border-radius: 50%;
+	/*
+	width: 100px;
+	height: 100px;
+	top: 54.5px;
+	left: 104px;
+	border: 1px solid red;
+	overflow: hidden;*/
+}
+
+#pointC {
+	position: absolute;
+	border-radius: 50%;
+	width: 10px;
+	height: 10px;
+	background: blue;
+	top: 250px;
+	left: 800px;
+}
+
+#AroundPointC {
+	position: absolute;
+	border-radius: 50%;
+	/*
+	width: 100px;
+	height: 100px;
+	top: 54.5px;
+	left: 104px;
+	border: 1px solid red;
+	overflow: hidden;*/
+}
+
+#blackPoint {
+	position: absolute;
+	border-radius: 50%;
+	background: black;
+}
+
+.frac {
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    letter-spacing: 0.001em;
+    text-align: center;
+}
+.frac > span {
+    display: block;
+    padding: 0.1em;
+}
+.frac span.bottom {
+    border-top: thin solid black;
+}
+.frac span.symbol {
+    display: none;
+} 
+
+.motionanimation{
+	width: 1000px;
+	height: 500px;
+	background-color: lightgray;
+	overflow: hidden;
+}
+
+@keyframes drawcircle {
+  from {transform: rotate(0deg);}
+  to {transform: rotate(360deg);}
+}
+
+.inneranimation{
+	position: relative;
+	display: block;
+	margin: auto;
+	background-color: lightgray;
+	overflow: hidden;
+	animation-name: drawcircle;
+	animation-duration: 4s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+	animation-fill-mode: backwards;
+}
