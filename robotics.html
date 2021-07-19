@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<link href='./style.css' rel='stylesheet'>
+<link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/dreampulse/computer-modern-web-font/master/fonts.css">
+</head>
+<body>
+
+<div class = "navbar">
+	<h1> Introduction To Robotics </h1>
+	<ul>
+	  <li><a href="#localize">Localization</a></li>
+	  <li><a href="#motion">Motion</a></li>
+	  <li><a href="#vision">Vision</a></li>
+	  <li><a href="#about">About</a></li>
+	</ul>
+</div>
+
+<div class="overall">
+
+<div class = "intro">
+	<p> In robotics, there are numerous algorithms that can be used for various calculations. We'll be introducing six algorithms today. </p> 
+	<ol style="margin-left: 100px">
+		<li> Robot Localization </li>
+		<br>
+		<li> Robot Motion </li>
+		<br>
+		<li> Robot Vision </li>
+		<br>
+		<li> Robot Controls </li>
+		<br>
+		<li> Robot Measurement </li>
+		<br>
+		<li> Robot Sensing </li>
+		<br>
+	</ol>
+</div> 
+<h1 id = "localize" style="background:DarkSlateBlue;width:1000px; padding:20px 0px"> Robot Localization </h1>
+
+<div class = "localize-text">
+	<span> Robot localization is a process used by a robot to determine its location based on the known locations of several objects or landmarks.</span>
+	<span> Specifically, in a 2D plane, if the locations of three landmarks are known, and the robot's distance from each of the three landmarks are known as well,
+		   the exact (x, y) coordinates can be determined. </span>
+	<p> To find the location of the robot, we can use the concept of circle intersection.</p>
+	<ol>
+		<li> If we know that the robot is of distance d<sub>a</sub> away from one point, we can draw a circle of radius d<sub>a</sub> around that point. Any point on that circle
+			 is a possible location of the robot </li>
+		<li> Now, if we are also a distance d<sub>b</sub> away from a second point, we can draw a circle of radius d<sub>b</sub> around the second point. The two circles intersect
+			 at at most 2 points, so we've narrowed down the robot's location to 2 points. </li>
+		<li> Finally, with a third point at a distance of d<sub>c</sub> away, we can draw a circle which will intersect one of the 2 points, and thus the location of the robot
+			 can be determined. </li>
+	</ol>
+	<br>
+	<p> Below is an interactive that shows you the concept of robot localization. There are three landmarks with colors red, blue, and yellow. 
+		Click anywhere in the gray box and drag your mouse around to see how the robot's location can be determined. You can also modify the coordinates of each landmark below.</p>
+</div> 
+<!--
+<div class = "animation" id = "animate">
+	<div id = "pointA">
+	</div>
+	<div id = "AroundPointA">
+	</div>
+	<div id = "pointB">
+	</div>
+	<div id = "AroundPointB">
+	</div>
+	<div id = "pointC">
+	</div>
+	<div id = "AroundPointC">
+	</div>
+	<div id = "blackPoint">
+	</div>
+</div>
+<br>-->
+<canvas class = "animation2" id = "animate2" width ="1000" height= "500">
+</canvas>
+
+<span> Red Point: </span> <input type="number" id="curredx" value=150 onchange="changeTextValue()">, <input type="number" id="curredy" value=100 onchange="changeTextValue()">
+ Blue Point: </span> <input type="number" id="curblux" value=450 onchange="changeTextValue()">, <input type="number" id="curbluy" value=400 onchange="changeTextValue()">
+ Yellow Point: </span> <input type="number" id="curyelx" value=800 onchange="changeTextValue()">, <input type="number" id="curyely" value=250 onchange="changeTextValue()"></span>
+
+
+<p> Mathematically, how do we calculate the location of the robot? </p>
+
+<p> We have three circles, so let's define <span class="latex">(x<sub>a</sub>, y<sub>a</sub>)</span>, <span class="latex">(x<sub>b</sub>, y<sub>b</sub>)</span>
+, <span class="latex">(x<sub>c</sub>, y<sub>c</sub>)</span> as the centers of the three circles. 
+  Let <span class = "latex"> r<sub>a</sub>, r<sub>b</sub>, r<sub>c</sub> </span>be the radius of the three circles, respectively.</p>
+<p> We can write the equations of the circles: </p>
+<ol>
+	<li class = "latex"> (x-x<sub>a</sub>)<sup>2</sup>+(y-y<sub>a</sub>)<sup>2</sup> = r<sub>a</sub><sup>2</sup> &rarr; 
+	(x<sup>2</sup>-2x<sub>a</sub>x+x<sub>a</sub><sup>2</sup>)+(y<sup>2</sup>-2y<sub>a</sub>y+y<sub>a</sub><sup>2</sup>) = r<sub>a</sub><sup>2</sup></li>
+	<li class = "latex"> (x-x<sub>b</sub>)<sup>2</sup>+(y-y<sub>b</sub>)<sup>2</sup> = r<sub>b</sub><sup>2</sup> &rarr; 
+	(x<sup>2</sup>-2x<sub>b</sub>x+x<sub>b</sub><sup>2</sup>)+(y<sup>2</sup>-2y<sub>b</sub>y+y<sub>b</sub><sup>2</sup>) = r<sub>b</sub><sup>2</sup></li>
+	<li class = "latex"> (x-x<sub>c</sub>)<sup>2</sup>+(y-y<sub>c</sub>)<sup>2</sup> = r<sub>c</sub><sup>2</sup> &rarr; 
+	(x<sup>2</sup>-2x<sub>c</sub>x+x<sub>c</sub><sup>2</sup>)+(y<sup>2</sup>-2y<sub>c</sub>y+y<sub>c</sub><sup>2</sup>) = r<sub>c</sub><sup>2</sup></li>
+</ol>
+
+<p> First, we can find the <span class = "latex"> (x, y)</span> solutions to equations 1 and 2. Subtracting equations 1 and 2 gives:</p>
+<p class = "latex"> &emsp; 2(x<sub>b</sub>-x<sub>a</sub>)x+(x<sub>a</sub><sup>2</sup>-x<sub>b</sub><sup>2</sup>)+2(y<sub>b</sub>-y<sub>a</sub>)y+(y<sub>a</sub><sup>2</sup>-y<sub>b</sub><sup>2</sup>) = r<sub>a</sub><sup>2</sup>-r<sub>b</sub><sup>2</sup>
+&rarr; y = <span class = "frac"><span>-(x<sub>b</sub>-x<sub>a</sub>)</span><span class="symbol">/</span>
+    <span class="bottom">(y<sub>b</sub>-y<sub>a</sub>)</span></span>x+<span class = "frac">
+	<span>(r<sub>a</sub><sup>2</sup>-r<sub>b</sub><sup>2</sup>)-(y<sub>a</sub><sup>2</sup>-y<sub>b</sub><sup>2</sup>)-(x<sub>a</sub><sup>2</sup>-x<sub>b</sub><sup>2</sup>)</span>
+	<span class = "symbol">/</span><span class = "bottom">2(y<sub>b</sub>-y<sub>a</sub>)</span></p>
+<p> This equation is quite complicated, but it's in the form of <span class = "latex"> y = mx+b</span>. Let
+	<span class="latex">m = <span class = "frac"><span>-(x<sub>b</sub>-x<sub>a</sub>)</span><span class="symbol">/</span>
+    <span class="bottom">(y<sub>b</sub>-y<sub>a</sub>)</span></span> and 
+	<span class="latex">b = <span class = "frac">
+	<span>(r<sub>a</sub><sup>2</sup>-r<sub>b</sub><sup>2</sup>)-(y<sub>a</sub><sup>2</sup>-y<sub>b</sub><sup>2</sup>)-(x<sub>a</sub><sup>2</sup>-x<sub>b</sub><sup>2</sup>)</span>
+	<span class = "symbol">/</span><span class = "bottom">2(y<sub>b</sub>-y<sub>a</sub>)</span></span>.</p>
+<p> Now, we can substitute this value of <span class="latex">y</span> into equation 1. </p>
+<p class = "latex"> &emsp; (x<sup>2</sup>-2x<sub>a</sub>x+x<sub>a</sub><sup>2</sup>)+((mx+b)<sup>2</sup>-2y<sub>a</sub>(mx+b)+y<sub>a</sub><sup>2</sup>) = r<sub>a</sub><sup>2</sup>
+&rarr; (1+m<sup>2</sup>)x<sup>2</sup>+(-2x<sub>a</sub>+2mb-2y<sub>a</sub>m)x+(x<sub>a</sub><sup>2</sup>+b<sup>2</sup>-2y<sub>a</sub>b+y<sub>a</sub><sup>2</sup>-r<sub>a</sub><sup>2</sup>) = 0</p>
+<p> Again, this equation is complicated, but it is now a quadratic equation in the form of <span class="latex">Ax<sup>2</sup>+Bx+C=0</span>. Thus we can let
+<span class="latex">A = (1+m<sup>2</sup>), B = (-2x<sub>a</sub>+2mb-2y<sub>a</sub>m)</span>, and <span class="latex">C = (x<sub>a</sub><sup>2</sup>+b<sup>2</sup>-2y<sub>a</sub>b+y<sub>a</sub><sup>2</sup>-r<sub>a</sub><sup>2</sup>).</p>
+<p> By simply applying the quadratic formula, we get two solutions for x, denoted by <span class="latex"> x<sub>1</sub> =
+<span class="frac"><span>-B+&radic;(B<sup>2</sup>-4AC)</span><span class="symbol">/</span><span class = "bottom">2A</span></span></span> and
+<span class="latex"> x<sub>2</sub> =
+<span class="frac"><span>-B-&radic;(B<sup>2</sup>-4AC)</span><span class="symbol">/</span><span class = "bottom">2A</span></span></span>.</p>
+
+<p> With only two possible coordinates <span class="latex">(x<sub>1</sub>, mx<sub>1</sub>+b)</span> and <span class="latex">(x<sub>2</sub>, mx<sub>2</sub>+b)</span>, we can plug
+both coordinates into equation 3. Whichever coordinate satisfies equation 3 is the location of the robot. <span></p>
+
+
+<div class = "localize">
+	<div class = "localize-title">
+		<h2> Calculate Position </h2>
+	</div>
+	<div class = "localize-input">
+		<div class = "points">
+			<p> <strong> Point A:</strong></p>
+			<input type="number" id="ax">
+			<a> , </a>
+			<input type="number" id="ay">
+			<p> <strong> Point B:</strong></p>
+			<input type="number" id="bx">
+			<a> , </a>
+			<input type="number" id="by">
+			<p> <strong> Point C:</strong></p>
+			<input type="number" id="cx">
+			<a> , </a>
+			<input type="number" id="cy">
+		</div>
+		<div class = "distances">
+			<p> <strong> Distance from A:</strong></p>
+			<input type="number" id="ad">
+			<p> <strong> Distance from B: </strong></p>
+			<input type="number" id="bd">
+			<p> <strong> Distance from C: </strong></p>
+			<input type="number" id="cd">
+		</div>
+	</div>
+	<div class = "answer">
+		<button onclick="getPosition()">Calculate!</button>
+		<p> Your Coordinates: </p>
+		<div class = "answer-box">
+			<h2 id = "LocalizedAnswer" style="display:inline">hello</h2>
+		</div>
+	</div>
+</div>
+<br><br><br><br>
+
+
+<h1 id = "motion" style="background:DarkSlateBlue;width:1000px; padding:20px 0px"> Robot Motion </h1>
+
+<div class = "motionanimation">
+	<canvas class = "inneranimation" id = "rotatingsquare" width="500" height="500">
+	</canvas>
+</div>
+
+<canvas class = "temp" width = "500" height = "500"> </canvas>
+
+<div class = "motion" id = "motion">
+	<div class = "motion-title">
+		<h2> Calculate Orientation </h2>
+	</div>
+	<div class = "motion-input">
+		<div class = "constants">
+			<p> <strong> Robot Width </strong></p>
+			<input type="number" id="w">
+			<p> <strong> Wheel Radius </strong></p>
+			<input type="number" id="rad">
+			<p> <strong> Initial Orientation (rad) </strong></p>
+			<input type="number" id="theta">
+		</div>
+		<div class = "wheeltimespeed">
+			<p> <strong> Right Wheel Speed (rad/s) </strong></p>
+			<input type="number" id="rws">
+			<p> <strong> Left Wheel Speed (rad/s) </strong></p>
+			<input type="number" id="lws">
+			<p> <strong> Time (s) </strong></p>
+			<input type="number" id="t">
+		</div>
+	</div>
+	<div class = "answer">
+		<button onclick="getOrientation()">Calculate!</button>
+		<p> Your Orientation: </p>
+		<div class = "answer-box">
+			<h2 id = "OrientationAnswer" style="display:inline">hello</h2>
+		</div>
+	</div>
+</div>
+
+<br><br><br><br>
+<h1 id = "vision" style="background:DarkSlateBlue;width:1000px; padding:20px 0px"> Robot Vision </h1>
+
+<div class = "vision" id = "vision">
+	<div class = "vision-title">
+		<h2> Calculate Distance </h2>
+	</div>
+	<div class = "vision-input">
+		<div class = "vision-constants">
+			<p> <strong> Distance Between Cameras (cm) </strong></p>
+			<input type="number" id="cameraD">
+			<p> <strong> Focal Length (mm) </strong></p>
+			<input type="number" id="focalL">
+			<p> <strong> Sensor Width (mm) </strong></p>
+			<input type="number" id="sensorW">
+		</div>
+		<div class = "vision-variables">
+			<p> <strong> Left Camera Pixel Distance </strong></p>
+			<input type="number" id="lcpd">
+			<p> <strong> Right Camera Pixel Distance </strong></p>
+			<input type="number" id="rcpd">
+			<p> <strong> Number of Pixels Per Camera </strong> </p>
+			<input type="number" id = "pixelNum">
+		</div>
+	</div>
+	<div class = "answer">
+		<button onclick="getDistance()">Calculate!</button>
+		<p> Your Distance: </p>
+		<div class = "answer-box">
+			<h2 id = "DistanceAnswer" style="display:inline">hello</h2>
+		</div>
+	</div>
+</div>
+
+<br><br><br><br>
+
+<h1 id = "control" style="background:DarkSlateBlue;width:1000px; padding:20px 0px"> Robot Controls </h1>
+
+<div class = "controls" id = "controls">
+	<div class = "control-title">
+		<h2> Calculate Steering Angle </h2>
+	</div>
+	<div class = "control-input">
+		<div class = "control-constants">
+			<p> <strong> First Endpoint of the Line </strong></p>
+			<input type="number" id="lx1">
+			<a> , </a>
+			<input type="number" id="ly1">
+			<p> <strong> Second Endpoint of the Line </strong></p>
+			<input type="number" id="lx2">
+			<a> , </a>
+			<input type="number" id="ly2">
+		</div>
+		<div class = "control-variables">
+			<p> <strong> Robot Position </strong></p>
+			<input type="number" id="rx1">
+			<a> , </a>
+			<input type="number" id="ry1">
+			<p> <strong> Proportional Gain (degrees/m) </strong></p>
+			<input type="number" id="pg">
+		</div>
+	</div>
+	<div class = "answer">
+		<button onclick="getAngle()">Calculate!</button>
+		<p> Your Distance: </p>
+		<div class = "answer-box">
+			<h2 id = "AngleAnswer" style="display:inline; font-size:20px">hello</h2>
+		</div>
+	</div>
+</div>
+
+
+
+</div>
+
+<script>
+	document.getElementById("animate2").addEventListener("click", printMouse2);
+	document.getElementById("animate2").onmousedown = dragMouse2;
+	
+	var redx = 150; var redy = 100; var blux = 450; var bluy = 400; var yelx = 800; var yely = 250;
+	
+	function changeTextValue(){
+		redx = parseFloat(document.getElementById("curredx").value);
+		redy = parseFloat(document.getElementById("curredy").value);
+		blux = parseFloat(document.getElementById("curblux").value);
+		bluy = parseFloat(document.getElementById("curbluy").value);
+		yelx = parseFloat(document.getElementById("curyelx").value);
+		yely = parseFloat(document.getElementById("curyely").value);
+		initialPoints();
+	}
+	
+	function dragMouse2(e){
+		document.onmousemove = printMouse2;
+		document.onmouseup = closeDragElement2;
+	}
+	
+	function closeDragElement2(e){
+		document.onmouseup = null;
+		document.onmousemove = null;
+	}
+	
+	function initialPoints(){
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.beginPath();
+		ctx.fillStyle = "red";
+		ctx.arc(redx, redy, 5, 0, Math.PI*2);
+		ctx.fill();
+		ctx.closePath();
+		ctx.beginPath();
+		ctx.fillStyle = "blue";
+		ctx.arc(blux, bluy, 5, 0, Math.PI*2);
+		ctx.fill();
+		ctx.closePath();
+		ctx.beginPath();
+		ctx.fillStyle = "yellow";
+		ctx.arc(yelx, yely, 5, 0, Math.PI*2);
+		ctx.fill();
+		ctx.closePath();
+		ctx.font = "10px Arial";
+		ctx.fillStyle = "red";
+		ctx.textAlign = "center";
+		ctx.fillText("("+redx+", "+redy+")", redx, redy-10);
+		ctx.font = "10px Arial";
+		ctx.fillStyle = "blue";
+		ctx.textAlign = "center";
+		ctx.fillText("("+blux+", "+bluy+")", blux, bluy-10);
+		ctx.font = "10px Arial";
+		ctx.fillStyle = "yellow";
+		ctx.textAlign = "center";
+		ctx.fillText("("+yelx+", "+yely+")", yelx, yely-10);
+	}
+	
+	var canvas = document.getElementById("animate2");
+	var ctx = canvas.getContext("2d");
+	initialPoints();
+	
+	function drawCircle(xpos, ypos, rad, strcol){
+		ctx.beginPath();
+		ctx.setLineDash([5, 0]);
+		ctx.lineWidth = 2;
+		ctx.strokeStyle = strcol;
+		ctx.arc(xpos, ypos, rad, 0, Math.PI*2);
+		ctx.stroke();
+		ctx.closePath();
+	}
+	
+	function drawLine(fromx, fromy, tox, toy, linecol){
+		ctx.beginPath();
+		ctx.setLineDash([5, 3]);
+		ctx.strokeStyle = linecol;
+		ctx.moveTo(fromx,fromy);
+		ctx.lineTo(tox, toy);
+		ctx.stroke();
+		ctx.closePath();
+	}
+	
+	function drawAnimation(arad, brad, crad, xpos2, ypos2){
+		initialPoints();
+		drawCircle(redx, redy, arad, "red");
+		drawCircle(blux, bluy, brad, "blue");
+		drawCircle(yelx, yely, crad, "yellow");
+		ctx.beginPath();
+		ctx.fillStyle = "black";
+		ctx.arc(xpos2, ypos2, 3, 0, Math.PI*2);
+		ctx.fill();
+		ctx.closePath();
+		ctx.beginPath();
+		ctx.font = "10px Arial";
+		ctx.fillStyle = "black";
+		ctx.textAlign = "center";
+		ctx.fillText("("+xpos2.toFixed(0)+", "+ypos2.toFixed(0)+")", xpos2, ypos2-10);
+		ctx.closePath();
+		drawLine(redx, redy, xpos2, ypos2, "red");
+		ctx.beginPath();
+		ctx.font = "10px Arial";
+		ctx.fillStyle = "red";
+		ctx.textAlign = "center";
+		ctx.fillText("r = " + arad.toFixed(2), (xpos2+redx)/2, (ypos2+redy)/2);
+		ctx.closePath();
+		drawLine(blux, bluy, xpos2, ypos2, "blue");
+		ctx.beginPath();
+		ctx.font = "10px Arial";
+		ctx.fillStyle = "blue";
+		ctx.textAlign = "center";
+		ctx.fillText("r = " + brad.toFixed(2), (xpos2+blux)/2, (ypos2+bluy)/2);
+		ctx.closePath();
+		drawLine(yelx, yely, xpos2, ypos2, "yellow");
+		ctx.beginPath();
+		ctx.font = "10px Arial";
+		ctx.fillStyle = "yellow";
+		ctx.textAlign = "center";
+		ctx.fillText("r = " + crad.toFixed(2), (xpos2+yelx)/2, (ypos2+yely)/2);
+		ctx.closePath();
+	}
+	
+	function printMouse2(event){
+		var bounds = event.target.getBoundingClientRect();
+		var xclick = 1.0*event.clientX-1.0*bounds.left;
+		var yclick = 1.0*event.clientY-1.0*bounds.top;
+		yclick = yclick;
+		xclick = xclick;
+		initialPoints();
+		var arad = Math.sqrt((xclick-redx)*(xclick-redx)+(yclick-redy)*(yclick-redy));
+		var brad = Math.sqrt((xclick-blux)*(xclick-blux)+(yclick-bluy)*(yclick-bluy));
+		var crad = Math.sqrt((xclick-yelx)*(xclick-yelx)+(yclick-yely)*(yclick-yely));
+		drawAnimation(arad, brad, crad, xclick, yclick);
+	}
+	
+	
+	drawMotionPoints(1.5, 1, 50, 10);
+
+	function drawMotionPoints(ras, las, robotwidth, wheelrad){
+	/*
+		var motioncanvas = document.getElementById("rotatingsquare");
+		var motionctx = motioncanvas.getContext("2d");
+		motionctx.beginPath();
+		motionctx.strokeStyle = "red";
+		var innerradius = las*robotwidth/(ras-las);
+		motionctx.arc(250+innerradius, 250+innerradius, 10, 0, 2 * Math.PI);
+		motionctx.stroke();
+		motionctx.closePath();
+		motionctx.beginPath();
+		motionctx.strokeStyle = "blue";
+		motionctx.arc(250+innerradius+robotwidth, 250+innerradius+robotwidth, 10, 0, 2*Math.PI);
+		motionctx.stroke();
+		motionctx.closePath();
+		document.getElementById("rotatingsquare").style.background-color = "black";
+		document.getElementById("rotatingsquare").style.background-color = "black;
+		
+		motionctx.beginPath();
+		motionctx.strokeStyle = "red";
+		motionctx.arc(250, 250, 100, 0, 3);
+		motionctx.stroke();
+		motionctx.closePath();*/
+	}
+/*
+	document.getElementById("animate").addEventListener("click", printMouse);
+	document.getElementById("animate").onmousedown = dragMouse;
+	
+	function dragMouse(e){
+		document.onmousemove = printMouse;
+		document.onmouseup = closeDragElement;
+	}
+	
+	function closeDragElement(e){
+		document.onmouseup = null;
+		document.onmousemove = null;
+	}
+	
+	function printMouse(event){
+		document.getElementById("AroundPointA").style.width = null;
+		document.getElementById("AroundPointA").style.height = null;
+		document.getElementById("AroundPointA").style.border = null;
+		document.getElementById("AroundPointA").style.top = null;
+		document.getElementById("AroundPointA").style.left = null;
+		document.getElementById("AroundPointB").style.width = null;
+		document.getElementById("AroundPointB").style.height = null;
+		document.getElementById("AroundPointB").style.border = null;
+		document.getElementById("AroundPointB").style.top = null;
+		document.getElementById("AroundPointB").style.left = null;
+		document.getElementById("AroundPointC").style.width = null;
+		document.getElementById("AroundPointC").style.height = null;
+		document.getElementById("AroundPointC").style.border = null;
+		document.getElementById("AroundPointC").style.top = null;
+		document.getElementById("AroundPointC").style.left = null;
+		document.getElementById("blackPoint").style.left = null;
+		document.getElementById("blackPoint").style.top = null;
+		document.getElementById("blackPoint").style.width = null;
+		document.getElementById("blackPoint").style.height = null;
+		var bounds = event.target.getBoundingClientRect();
+		var xclick = 1.0*event.clientX-1.0*bounds.left;
+		var yclick = 1.0*event.clientY-1.0*bounds.top;
+		var arad = Math.sqrt((xclick-155)*(xclick-155)+(yclick-105)*(yclick-105));
+		document.getElementById("AroundPointA").style.width = 2*arad+"px";
+		document.getElementById("AroundPointA").style.height = 2*arad+"px";
+		document.getElementById("AroundPointA").style.border = "3px solid red";
+		document.getElementById("AroundPointA").style.top = 105-arad-2.5+"px";
+		document.getElementById("AroundPointA").style.left = 155-arad-3+"px";
+		var brad = Math.sqrt((xclick-455)*(xclick-455)+(yclick-405)*(yclick-405));
+		document.getElementById("AroundPointB").style.width = 2*brad+"px";
+		document.getElementById("AroundPointB").style.height = 2*brad+"px";
+		document.getElementById("AroundPointB").style.border = "3px solid yellow";
+		document.getElementById("AroundPointB").style.top = 400-brad+5-2.5+"px";
+		document.getElementById("AroundPointB").style.left = 450-brad+5-3+"px";
+		var crad = Math.sqrt((xclick-805)*(xclick-805)+(yclick-255)*(yclick-255));
+		document.getElementById("AroundPointC").style.width = 2*crad+"px";
+		document.getElementById("AroundPointC").style.height = 2*crad+"px";
+		document.getElementById("AroundPointC").style.border = "3px solid blue";
+		document.getElementById("AroundPointC").style.top = 250-crad+5-2.5+"px";
+		document.getElementById("AroundPointC").style.left = 800-crad+5-3+"px";
+		document.getElementById("blackPoint").style.left = (xclick - 5).toString() + "px";
+		document.getElementById("blackPoint").style.top = (yclick - 5).toString() + "px";
+		document.getElementById("blackPoint").style.width = "10px";
+		document.getElementById("blackPoint").style.height = "10px";
+	}*/
+	
+	function getPosition() {
+		var ax = document.getElementById("ax").value;
+		var ay = document.getElementById("ay").value;
+		var bx = document.getElementById("bx").value;
+		var by = document.getElementById("by").value;
+		var cx = document.getElementById("cx").value;
+		var cy = document.getElementById("cy").value;
+		var ad = document.getElementById("ad").value;
+		var bd = document.getElementById("bd").value;
+		var cd = document.getElementById("cd").value;
+		if (ax.length == 0 || ay.length == 0 || bx.length == 0 || by.length == 0 || cx.length == 0 || cy.length == 0 || 
+			ad.length == 0 || bd.length == 0 || cd.length == 0){
+			window.alert("Fill out all boxes!");
+			return;
+		}
+		var x_coeff = 2.0*(bx-ax);
+		var y_coeff = 2.0*(by-ay);
+		var b = (ad*ad-bd*bd+by*by-ay*ay+bx*bx-ax*ax)/y_coeff;
+		var m = -x_coeff/y_coeff;
+		//document.getElementById("LocalizedAnswer").innerHTML = m+" "+b;
+		var A = (1+m*m);
+		var B = -2*ax+2*m*(b-ay);
+		var C = ax*ax+(b-ay)*(b-ay)-ad*ad;
+		var discrim = B*B-4*A*C;
+		//document.getElementById("LocalizedAnswer").innerHTML = A+" "+B+" "+C;
+		document.getElementById("LocalizedAnswer").style.visibility = "visible";
+		if (discrim < 0.0){
+			document.getElementById("LocalizedAnswer").innerHTML = "Does Not Exist!";
+			return;
+		}
+		var x1 = (-B+Math.sqrt(discrim))/(2*A);
+		var x2 = (-B-Math.sqrt(discrim))/(2*A);
+		var y1 = m*x1+b;
+		var y2 = m*x2+b;
+		if (Math.abs((x1-cx)*(x1-cx)+(y1-cy)*(y1-cy)-cd*cd) <= 0.01){
+			document.getElementById("LocalizedAnswer").innerHTML = "("+x1+","+y1+")";
+			redx = parseFloat(ax); redy = parseFloat(ay); blux = parseFloat(bx); bluy = parseFloat(by); yelx = parseFloat(cx); yely = parseFloat(cy);
+			drawAnimation(parseFloat(ad), parseFloat(bd), parseFloat(cd), parseFloat(x1), parseFloat(y1));
+			return;
+		}
+		if (Math.abs((x2-cx)*(x2-cx)+(y2-cy)*(y2-cy)-cd*cd) <= 0.01){
+			document.getElementById("LocalizedAnswer").innerHTML = "("+x2+","+y2+")";
+			redx = parseFloat(ax); redy = parseFloat(ay); blux = parseFloat(bx); bluy = parseFloat(by); yelx = parseFloat(cx); yely = parseFloat(cy);
+			drawAnimation(parseFloat(ad), parseFloat(bd), parseFloat(cd), parseFloat(x2), parseFloat(y2));
+			return;
+		}
+		document.getElementById("LocalizedAnswer").innerHTML = "Does Not Exist!";
+	}
+	
+	function getOrientation() {
+		var w = document.getElementById("w").value;
+		var r = document.getElementById("rad").value;
+		var angle = document.getElementById("theta").value;
+		var rws = document.getElementById("rws").value;
+		var lws = document.getElementById("lws").value;
+		var t = document.getElementById("t").value;
+		if (w.length == 0 || r.length == 0 || angle.length == 0 || rws.length == 0 || lws.length == 0 || t.length == 0){
+			window.alert("Fill out all boxes!");
+			return;
+		}
+		document.getElementById("OrientationAnswer").style.visibility = "visible";
+		var add = r/w*(rws-lws)*t;
+		var newangle = parseFloat(angle)+add;
+		document.getElementById("OrientationAnswer").innerHTML = newangle;
+	}
+	
+	function getDistance() {
+		var cameraD = document.getElementById("cameraD").value;
+		var focalL = document.getElementById("focalL").value;
+		var sensorW = document.getElementById("sensorW").value;
+		var lcpd = document.getElementById("lcpd").value;
+		var rcpd = document.getElementById("rcpd").value;
+		var pixelNum = document.getElementById("pixelNum").value;
+		if (cameraD.length == 0 || focalL.length == 0 || sensorW.length == 0 || lcpd.length == 0 || rcpd.length == 0 || pixelNum.length == 0){
+			window.alert("Fill out all boxes!");
+			return;
+		}
+		cameraD *= 10;
+		var leftSlope = (pixelNum/2-parseFloat(lcpd))*sensorW/pixelNum/focalL;
+		var rightSlope = (pixelNum/2-parseFloat(rcpd))*sensorW/pixelNum/focalL;
+		document.getElementById("DistanceAnswer").style.visibility = "visible";
+		if (Math.abs(rightSlope-leftSlope) <= 0.0001){
+			document.getElementById("DistanceAnswer").innerHTML = "Does Not Exist!";
+			return;
+		}
+		var ans = cameraD/(rightSlope-leftSlope);
+		ans /= 100;
+		document.getElementById("DistanceAnswer").innerHTML = ans+" cm";
+	}
+	
+	function getAngle() {
+		var lx1 = document.getElementById("lx1").value;
+		var ly1 = document.getElementById("ly1").value;
+		var lx2 = document.getElementById("lx2").value;
+		var ly2 = document.getElementById("ly2").value;
+		var rx1 = document.getElementById("rx1").value;
+		var ry1 = document.getElementById("ry1").value;
+		var pg = document.getElementById("pg").value;
+		if (lx1.length == 0 || ly1.length == 0 || ly1.length == 0 || ly2.length == 0 || rx1.length == 0 || ry1.length == 0 || pg.length == 0){
+			window.alert("Fill out all boxes!");
+			return;
+		}
+		document.getElementById("AngleAnswer").style.visibility = "visible";
+		if (lx2 == lx1){
+			var a = 1.0;
+			var c = -lx1;
+			var err = Math.abs(a*rx1+c)/a;
+		} else {
+			var a = -(ly2-ly1)/(lx2-lx1);
+			var b = 1.0;
+			var c = -a*lx1-b*ly1;
+			var err = Math.abs(a*rx1+b*ry1+c)/Math.sqrt(a*a+b*b);
+		}
+		var cross = (ly2-ly1)*(rx1-lx2)-(lx2-lx1)*(ry1-ly2);
+		var move = Math.abs(err)*pg;
+		if (cross < 0)
+			document.getElementById("AngleAnswer").innerHTML = "The steering angle is " + move + " degrees to the left";
+		else if (cross > 0)
+			document.getElementById("AngleAnswer").innerHTML = "The steering angle is " + move + " degrees to the right";
+		else
+			document.getElementById("AngleAnswer").innerHTML = "The robot is already on the path";
+	}
+</script>
+
+</body>
+</html>
