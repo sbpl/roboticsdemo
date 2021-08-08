@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title> Introduction To Robotics </title>
 <meta charset="UTF-8" />
-<link href='./assets/css/style.css' rel='stylesheet'>
+<link href='./style.css' rel='stylesheet'>
 <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/dreampulse/computer-modern-web-font/master/fonts.css">
+
+<style>
+@keyframes drawcircleCW {
+  from {transform: rotate(0deg);}
+  to {transform: rotate(360deg);}
+}
+
+@keyframes drawcircleCCW {
+  from {transform: rotate(0deg);}
+  to {transform: rotate(-360deg);}
+}
+</style>
 </head>
 <body>
 
@@ -77,9 +88,9 @@
 <canvas class = "animation2" id = "animate2" width ="1000" height= "500">
 </canvas>
 
-<span> Red Point: </span> <input type="number" id="curredx" value=150 onchange="changeTextValue()">, <input type="number" id="curredy" value=100 onchange="changeTextValue()">
- Blue Point: </span> <input type="number" id="curblux" value=450 onchange="changeTextValue()">, <input type="number" id="curbluy" value=400 onchange="changeTextValue()">
- Yellow Point: </span> <input type="number" id="curyelx" value=800 onchange="changeTextValue()">, <input type="number" id="curyely" value=250 onchange="changeTextValue()"></span>
+<span> Red Landmark: </span> <input type="number" id="curredx" value=150 onchange="changeTextValue()" style="width: 50px;">, <input type="number" id="curredy" value=100 onchange="changeTextValue()" style="width: 50px;">
+ Blue Landmark: </span> <input type="number" id="curblux" value=450 onchange="changeTextValue()" style="width: 50px;">, <input type="number" id="curbluy" value=400 onchange="changeTextValue()" style="width: 50px;">
+ Yellow Landmark: </span> <input type="number" id="curyelx" value=800 onchange="changeTextValue()" style="width: 50px;">, <input type="number" id="curyely" value=250 onchange="changeTextValue()" style="width: 50px;"></span>
 
 
 <p> Mathematically, how do we calculate the location of the robot? </p>
@@ -164,12 +175,48 @@ both coordinates into equation 3. Whichever coordinate satisfies equation 3 is t
 
 <h1 id = "motion" style="background:DarkSlateBlue;width:1000px; padding:20px 0px"> Robot Motion </h1>
 
+<p> There are many instances where we want to model the motion of a robot. In this case, we'll assume that our robot uses a <strong> differential drive</strong>.
+A differential drive robot's movement is based on a left and right wheel, each of which operate independently of each other. </p>
+
+<p> While the speed's of the two wheels of the robot are constant, the robot moves along a circular path, which makes it easy for us to calculate where the robot is located. Even if the speeds of each
+wheel change throughout the duration of the robot's motion, the path of the robot will still be composed of many circular arcs. </p>
+
+<p> Below is an animation that displays a robot's motion. You can modify parameters that describe the path of the robot. The red circle represents the robot's left wheel, while the blue circle
+represents the robot's right wheel.</p> 
+
 <div class = "motionanimation">
 	<canvas class = "inneranimation" id = "rotatingsquare" width="500" height="500">
 	</canvas>
 </div>
+<span> Left Angular Speed (rad/s): </span> <input type = "number" id = "inputlas" style="width: 50px;" onchange="changeMotionParams()" value = 1.5> <span> Right Angular Speed (rad/s): </span> <input type = "number" id = "inputras" style="width: 50px;" onchange="changeMotionParams()" value = 1>
+<span> Robot Width (cm): </span> <input type = "number" id = "inputwidth" style="width: 50px;" onchange="changeMotionParams()" value = 50> <span> Wheel Radius (cm): </span> <input type = "number" id = "inputrad" style="width: 50px;" onchange="changeMotionParams()" value = 10>
 
-<canvas class = "temp" width = "500" height = "500"> </canvas>
+<p> Now let's try to find some other values based on the angular speeds of both wheels, the width of the robot (distance between the two wheels), and the wheel radius. </p>
+
+<p> Without loss of generality, let's assume the robot's right angular speed is greater than its left angular speed. Define <span class="latex">&omega;<sub>r</sub>, &omega;<sub>l</sub>, R<sub>w</sub></span> and <span class = "latex">W</span> as the right wheel's angular speed, left wheel's angular speed,
+wheel radius, and robot width respectively.</p>
+<p> If the angular speeds of both wheels remain constant, the robot will move in a circle. Thus, we will first find the inner and outer radii of the robot's motion, denoted by <span class="latex">r</span>
+and <span class="latex">R</span>. Since the robot moves in a circle, the angular speed or distance each wheel covers must be equal. This angular speed is not the angular speed of the wheel,
+but it is how quickly the robot turns. </p>
+
+<p> This angular speed, which we will denote as <span class="latex"> &omega;<sub>c</sub> </span>, is simply calculated by the tangential velocity divided by the radius of the circle. Therefore,
+we can write: </p>
+<p> &emsp; <span class="latex"> &omega;<sub>c</sub> = <span class="frac">&omega;<sub>l</sub>R<sub>w</sub><span class="symbol">/</span><span class = "bottom">r</span></span> = 
+<span class="frac">&omega;<sub>r</sub>R<sub>w</sub><span class="symbol">/</span><span class = "bottom">R</span></span></span></p>
+
+<p> Since the difference between the inner and outer radius of the robot's path is the robot's width, we can write: </P> 
+<p> &emsp; <span class="latex"> R = r+W</span></p>
+
+<p> Combining the two equations, we can see that: 
+<p> &emsp; <span class="latex"> <span class="frac">&omega;<sub>l</sub><span class="symbol">/</span><span class = "bottom">r</span></span> = 
+<span class="frac">&omega;<sub>r</sub><span class="symbol">/</span><span class = "bottom">r+W</span></span></span> &rarr; 
+<span class="latex">r = <span class="frac">&omega;<sub>l</sub><span class="symbol">/</span><span class = "bottom">&omega;<sub>r</sub>-&omega;<sub>l</sub></span></span>W,
+R = r+W = <span class="frac">&omega;<sub>r</sub><span class="symbol">/</span><span class = "bottom">&omega;<sub>r</sub>-&omega;<sub>l</sub></span></span>W</span></p>
+<p> Now both the inner and outer radii of the robot's path is known. To find how much a robot turns (measured in radians) in a certain time period:</p>
+<p> <span class="latex">&emsp; &Delta;&theta; = &omega;<sub>c</sub>t = <span class="frac">&omega;<sub>l</sub>R<sub>w</sub><span class="symbol">/</span><span class = "bottom">r</span></span>t
+= <span class="frac">R<span class="symbol">/</span><span class = "bottom">W</span></span>(&omega;<sub>r</sub>-&omega;<sub>l</sub>)t</span></p>
+
+
 
 <div class = "motion" id = "motion">
 	<div class = "motion-title">
@@ -202,8 +249,12 @@ both coordinates into equation 3. Whichever coordinate satisfies equation 3 is t
 	</div>
 </div>
 
+
 <br><br><br><br>
 <h1 id = "vision" style="background:DarkSlateBlue;width:1000px; padding:20px 0px"> Robot Vision </h1>
+
+<canvas class = "visionanim" id = "visionanim" width ="1000" height= "500">
+</canvas>
 
 <div class = "vision" id = "vision">
 	<div class = "vision-title">
@@ -412,30 +463,286 @@ both coordinates into equation 3. Whichever coordinate satisfies equation 3 is t
 	
 	
 	drawMotionPoints(1.5, 1, 50, 10);
+	
+	
+	function changeMotionParams(){
+		var las = document.getElementById("inputlas").value;
+		var ras = document.getElementById("inputras").value;
+		var rwidth = document.getElementById("inputwidth").value;
+		var rrad = document.getElementById("inputrad").value;
+		drawMotionPoints(las, ras, rwidth, rrad);
+	}
 
-	function drawMotionPoints(ras, las, robotwidth, wheelrad){
-	/*
+	function drawMotionPoints(las, ras, robotwidth, wheelrad){
 		var motioncanvas = document.getElementById("rotatingsquare");
 		var motionctx = motioncanvas.getContext("2d");
+		motionctx.clearRect(0, 0, motioncanvas.width, motioncanvas.height);
 		motionctx.beginPath();
-		motionctx.strokeStyle = "red";
-		var innerradius = las*robotwidth/(ras-las);
-		motionctx.arc(250+innerradius, 250+innerradius, 10, 0, 2 * Math.PI);
-		motionctx.stroke();
+		motionctx.arc(250, 250, 5, 0, 2*Math.PI);
+		motionctx.fillStyle = "black";
+		motionctx.fill();
 		motionctx.closePath();
-		motionctx.beginPath();
-		motionctx.strokeStyle = "blue";
-		motionctx.arc(250+innerradius+robotwidth, 250+innerradius+robotwidth, 10, 0, 2*Math.PI);
-		motionctx.stroke();
-		motionctx.closePath();
-		document.getElementById("rotatingsquare").style.background-color = "black";
-		document.getElementById("rotatingsquare").style.background-color = "black;
-		
-		motionctx.beginPath();
-		motionctx.strokeStyle = "red";
-		motionctx.arc(250, 250, 100, 0, 3);
-		motionctx.stroke();
-		motionctx.closePath();*/
+		robotwidth *= 1;
+		wheelrad *= 1;
+		if (ras > las){
+			motionctx.beginPath();
+			motionctx.strokeStyle = "red";
+			var innerradius = las*robotwidth/(ras-las);
+			motionctx.arc(250+innerradius, 250+innerradius, 10, 0, 2 * Math.PI);
+			motionctx.stroke();
+			motionctx.closePath();
+			motionctx.beginPath();
+			motionctx.strokeStyle = "blue";
+			motionctx.arc(250+innerradius+robotwidth, 250+innerradius+robotwidth, 10, 0, 2*Math.PI);
+			motionctx.stroke();
+			motionctx.closePath();
+			var circularangspeed = las*wheelrad/innerradius;
+			document.getElementById("rotatingsquare").style.animationName = "drawcircleCCW";
+			document.getElementById("rotatingsquare").style.animationDuration = 2*Math.PI/circularangspeed+"s";
+		} else if (las > ras){
+			motionctx.beginPath();
+			motionctx.strokeStyle = "blue";
+			var innerradius = ras*robotwidth/(las-ras);
+			motionctx.arc(250+innerradius, 250+innerradius, 10, 0, 2 * Math.PI);
+			motionctx.stroke();
+			motionctx.closePath();
+			motionctx.beginPath();
+			motionctx.strokeStyle = "red";
+			motionctx.arc(250+innerradius+robotwidth, 250+innerradius+robotwidth, 10, 0, 2*Math.PI);
+			motionctx.stroke();
+			motionctx.closePath();
+			var circularangspeed = ras*wheelrad/innerradius;
+			document.getElementById("rotatingsquare").style.animationName = "drawcircleCW";
+			document.getElementById("rotatingsquare").style.animationDuration = 2*Math.PI/circularangspeed+"s";
+		}
+	}
+	
+	
+	
+	document.getElementById("visionanim").onmousedown = visionDragMouse;
+	
+	var tpixel = 3000;
+	var bpixel = 1000;
+	
+	drawVision(3000, 1000);
+	
+	function visionDragMouse(e){
+		var bounds = event.target.getBoundingClientRect();
+		var xclick = 1.0*event.clientX-1.0*bounds.left;
+		var yclick = 1.0*event.clientY-1.0*bounds.top;
+		var ytpos = 100+tpixel/4000*120;
+		var ybpos = 280+bpixel/4000*120;
+		if (xclick > 255 || xclick < 245)
+			return;
+		if (yclick <= ytpos+5 && yclick >= ytpos-5){
+			document.onmousemove = topVisionPrint;
+			document.onmouseup = visionCloseDrag;
+			return;
+		}
+		if (yclick <= ybpos+5 && yclick >= ybpos-5){
+			document.onmousemove = botVisionPrint;
+			document.onmouseup = visionCloseDrag;
+			return;
+		}
+	}
+	
+	function visionCloseDrag(e){
+		document.onmouseup = null;
+		document.onmousemove = null;
+	}
+	
+	function topVisionPrint(event){
+		var bounds = event.target.getBoundingClientRect();
+		var xclick = 1.0*event.clientX-1.0*bounds.left;
+		var yclick = 1.0*event.clientY-1.0*bounds.top;
+		if (yclick > 220 || yclick < 100)
+			return;
+		tpixel = (yclick-100)/120*4000;
+		drawVision(tpixel, bpixel);
+	}
+	
+	function botVisionPrint(event){
+		var bounds = event.target.getBoundingClientRect();
+		var xclick = 1.0*event.clientX-1.0*bounds.left;
+		var yclick = 1.0*event.clientY-1.0*bounds.top;
+		if (yclick > 400 || yclick < 280)
+			return;
+		bpixel = (yclick-280)/120*4000;
+		drawVision(tpixel, bpixel);
+	}
+	
+	function drawVision(ldist, rdist){
+		var visioncanvas = document.getElementById("visionanim");
+		var visionctx = visioncanvas.getContext("2d");
+		visionctx.clearRect(0, 0, visioncanvas.width, visioncanvas.height);
+		//two camera centers
+		visionctx.beginPath();
+		visionctx.fillStyle = "blue";
+		visionctx.arc(100, 160, 5, 0, 2*Math.PI);
+		visionctx.fill();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.fillStyle = "blue";
+		visionctx.arc(100, 340, 5, 0, 2*Math.PI);
+		visionctx.fill();
+		visionctx.closePath();
+		//rectangles
+		visionctx.beginPath();
+		visionctx.rect(248, 100, 4, 120);
+		visionctx.fillStyle = "blue";
+		visionctx.fill();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.rect(248, 280, 4, 120);
+		visionctx.fillStyle = "blue";
+		visionctx.fill();
+		visionctx.closePath();
+		//point on the rectangle
+		visionctx.beginPath();
+		visionctx.fillStyle = "red";
+		visionctx.arc(250, 100+ldist/4000*120, 5, 0, 2*Math.PI);
+		visionctx.fill();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.fillStyle = "red";
+		visionctx.arc(250, 280+rdist/4000*120, 5, 0, 2*Math.PI);
+		visionctx.fill();
+		visionctx.closePath();
+		//lines
+		var y1 = (100+ldist/4000*120-160)/150*900+160;
+		visionctx.beginPath();
+		visionctx.strokeStyle = "blue";
+		visionctx.moveTo(100, 160);
+		visionctx.lineTo(1000, y1);
+		visionctx.stroke();
+		visionctx.closePath();
+		var y2 = (280+rdist/4000*120-340)/150*900+340;
+		visionctx.beginPath();
+		visionctx.strokeStyle = "blue";
+		visionctx.moveTo(100, 340);
+		visionctx.lineTo(1000, y2);
+		visionctx.stroke();
+		visionctx.closePath();
+		//camera width
+		visionctx.beginPath();
+		visionctx.strokeStyle = "black";
+		visionctx.moveTo(70, 160);
+		visionctx.lineTo(80, 160);
+		visionctx.stroke();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.strokeStyle = "black";
+		visionctx.moveTo(70, 340);
+		visionctx.lineTo(80, 340);
+		visionctx.stroke();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.strokeStyle = "black";
+		visionctx.moveTo(75, 160);
+		visionctx.lineTo(75, 340);
+		visionctx.stroke();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.fillStyle = "red";
+		visionctx.textAlign = "right";
+		visionctx.fillText("180 cm", 65, 250);
+		visionctx.closePath();
+		//focal width
+		visionctx.beginPath();
+		visionctx.strokeStyle = "black";
+		visionctx.moveTo(100, 80);
+		visionctx.lineTo(250, 80);
+		visionctx.stroke();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.strokeStyle = "black";
+		visionctx.moveTo(100, 75);
+		visionctx.lineTo(100, 85);
+		visionctx.stroke();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.strokeStyle = "black";
+		visionctx.moveTo(250, 75);
+		visionctx.lineTo(250, 85);
+		visionctx.stroke();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.fillStyle = "red";
+		visionctx.textAlign = "center";
+		visionctx.fillText("150 cm", 175, 70);
+		visionctx.closePath();
+		//top lens
+		visionctx.beginPath();
+		visionctx.strokeStyle = "black";
+		visionctx.moveTo(260, 100);
+		visionctx.lineTo(270, 100);
+		visionctx.stroke();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.strokeStyle = "black";
+		visionctx.moveTo(260, 100+ldist/4000*120);
+		visionctx.lineTo(270, 100+ldist/4000*120);
+		visionctx.stroke();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.strokeStyle = "black";
+		visionctx.moveTo(265, 100);
+		visionctx.lineTo(265, 100+tpixel/4000*120);
+		visionctx.stroke();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.fillStyle = "red";
+		visionctx.textAlign = "left";
+		visionctx.fillText(tpixel.toFixed(0)+" px", 270, 100+ldist/4000*60);
+		visionctx.closePath();
+		//bottom lens
+		visionctx.beginPath();
+		visionctx.strokeStyle = "black";
+		visionctx.moveTo(260, 280);
+		visionctx.lineTo(270, 280);
+		visionctx.stroke();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.strokeStyle = "black";
+		visionctx.moveTo(260, 280+rdist/4000*120);
+		visionctx.lineTo(270, 280+rdist/4000*120);
+		visionctx.stroke();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.strokeStyle = "black";
+		visionctx.moveTo(265, 280);
+		visionctx.lineTo(265, 280+bpixel/4000*120);
+		visionctx.stroke();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.fillStyle = "red";
+		visionctx.textAlign = "left";
+		visionctx.fillText(bpixel.toFixed(0)+" px", 270, 280+rdist/4000*60);
+		visionctx.closePath();
+		//full top lens
+		visionctx.beginPath();
+		visionctx.strokeStyle = "black";
+		visionctx.moveTo(320, 100);
+		visionctx.lineTo(330, 100);
+		visionctx.stroke();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.strokeStyle = "black";
+		visionctx.moveTo(320, 220);
+		visionctx.lineTo(330, 220);
+		visionctx.stroke();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.strokeStyle = "black";
+		visionctx.moveTo(325, 100);
+		visionctx.lineTo(325, 220);
+		visionctx.stroke();
+		visionctx.closePath();
+		visionctx.beginPath();
+		visionctx.fillStyle = "red";
+		visionctx.textAlign = "left";
+		visionctx.fillText("4000 px, 120 cm", 330, 160);
+		visionctx.closePath();
 	}
 /*
 	document.getElementById("animate").addEventListener("click", printMouse);
