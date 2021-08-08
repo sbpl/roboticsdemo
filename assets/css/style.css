@@ -379,20 +379,22 @@ input {
 	overflow: hidden;
 }
 
-@keyframes drawcircle {
-  from {transform: rotate(0deg);}
-  to {transform: rotate(360deg);}
-}
-
 .inneranimation{
 	position: relative;
 	display: block;
 	margin: auto;
 	background-color: lightgray;
 	overflow: hidden;
-	animation-name: drawcircle;
+	animation-name: drawcircleCW;
 	animation-duration: 4s;
 	animation-iteration-count: infinite;
 	animation-timing-function: linear;
 	animation-fill-mode: backwards;
+}
+
+.visionanim {
+	width: 1000px;
+	height: 500px;
+	background-color: lightgray;
+	overflow: hidden;
 }
